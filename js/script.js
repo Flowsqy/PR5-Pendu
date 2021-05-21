@@ -8,18 +8,24 @@ tab=[
     "\n   +-------+\n   |       |\n   |       O\n   |      -|-\n   |      | |\n   |\n=============="
     ]
 
-window.addEventListener("load", initWord);
+window.addEventListener("load", init);
+
+var word;
+var devine;
+
+function init(){
+    initWord();
+}
 
 function initWord(){
-    var request = new XMLHttpRequest();
-    request.open('GET', "assets/dico.txt", true);
-    request.responseType = 'blob';
-    request.onload = function() {
+    document.getElementById("file-input").addEventListener("change", function(){
+        this.style.display = "none";
+        let file = this.files[0];
         let reader = new FileReader();
-        reader.readAsDataURL(request.response);
-        reader.onload = function(e){
-            console.log('DataURL:', e.target.result);
-        };
-    };
-    request.send();
+        reader.addEventListener("load", function(){
+            let words = this.result.split("\n");
+            word = words[Math.floor(Math.random() * words.length)];
+        })
+        reader.readAsText(file);
+    })
 }
