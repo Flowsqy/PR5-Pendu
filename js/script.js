@@ -200,7 +200,7 @@ function checkLetter(proposition){
 
 /**
  * Met à jour la proposition
- * @param {String} letter 
+ * @param {String} letter La lettre proposée par l'utilisateur
  * @returns true si la lettre est dans le mot, false sinon
  */
 function checkProposition(letter){
