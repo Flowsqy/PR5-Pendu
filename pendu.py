@@ -1,7 +1,8 @@
 import random
+from tkinter import *
 
 tab = [
-    "\n   +-------+\n   |\n   |\n   |\n   |\n  |\n==============",
+    "\n   +-------+\n   |\n   |\n   |\n   |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |\n   |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |       |\n   |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |      -|\n   |\n   |\n==============",
@@ -11,12 +12,22 @@ tab = [
 ]
 
 
+class AtomicInteger:
+    """
+    Obligé de créer une classe parceque les int sont transmis par valeur et non par référence
+    Quel enfer
+    """
+
+    def __init__(self, value):
+        self.value = value
+
+
 def askLetter():
     """
     Récuperer la valeur insérée par l'utilisateur
     :return: La chaîne de caractères correspondante
     """
-    return input("Entrez une lettre")
+    return entry.get()
 
 
 def displayInfo(info):
@@ -25,7 +36,16 @@ def displayInfo(info):
     :param info: La chaîne de caractère à afficher
     :return: None
     """
-    print(info)
+    infoLabel.config(text=info)
+
+
+def processInput(e):
+    """
+    Gere l'évènement du clic
+    :return: None
+    """
+    if loop():
+        endGame("_" not in devine)
 
 
 def game():
@@ -34,8 +54,7 @@ def game():
     :return:
     """
     drawLetters()
-    while not loop():
-        pass
+    displayInfo("Entrez une lettre")
 
 
 def endGame(win):
@@ -45,10 +64,11 @@ def endGame(win):
     :return: None
     """
     if win:
-        displayInfo("Tu as gagné, le mot était bien " + word.join(""))
+        displayInfo("Tu as gagné, le mot était bien " + "".join(word))
 
     else:
-        displayInfo("Tu as perdu, le mot était " + word.join(""))
+        displayInfo("Tu as perdu, le mot était " + "".join(word))
+    entry.destroy()
 
 
 def drawError():
@@ -56,9 +76,9 @@ def drawError():
     Afficher le pendu
     :return: true si le nombre maximal d'erreur est atteint, false sinon
     """
-    print(tab[errorCount])
-    errorCount += 1
-    return errorCount >= len(tab)
+    errorsLabel.config(text=tab[errorCount.value])
+    errorCount.value += 1
+    return errorCount.value >= len(tab)
 
 
 def drawTries():
@@ -66,7 +86,7 @@ def drawTries():
     Affiche la section des lettres déjà essayées
     :return: None
     """
-    draw(tries)
+    draw(tries, triesLabel)
 
 
 def drawLetters():
@@ -74,13 +94,14 @@ def drawLetters():
     Affiche les lettres du mot à deviner
     :return: None
     """
-    draw(devine)
+    draw(devine, lettersLabel)
 
 
-def draw(tab):
+def draw(tab, label):
     """
     Affiche un tableau dans un paragraphe donné
     :param tab: Le tableau de lettre à afficher
+    :param label: Le label a utiliser
     :return: None
     """
     to_display = ""
@@ -88,7 +109,7 @@ def draw(tab):
         if len(to_display) > 0:
             to_display += " "
         to_display += tab[i]
-    print(to_display)
+    label.config(text=to_display)
 
 
 def loop():
@@ -105,15 +126,17 @@ def loop():
         return
     tries.append(letter)
     drawTries()
+    entry.delete(0, END)
     result = checkProposition(letter)
     if result:
         displayInfo("Tu as trouvé la lettre " + letter)
         drawLetters()
     else:
         displayInfo("la lettre '" + letter + "' n'est pas dans le mot !")
+        drawLetters()
         if drawError():
             return True
-    return not "_" in devine
+    return "_" not in devine
 
 
 def checkLetter(proposition):
@@ -130,7 +153,7 @@ def checkLetter(proposition):
         displayInfo(character + " n'est pas une lettre")
         return None
     displayInfo("Entrez une lettre")
-    return character.toUpperCase()
+    return character.upper()
 
 
 def checkProposition(letter):
@@ -147,13 +170,39 @@ def checkProposition(letter):
     return output
 
 
-file = open("assets/dico.txt", "r", "utf-8")
+file = open("assets/dico.txt", mode="r", encoding="utf-8")
 words = file.readlines()
 file.close()
 word = words[random.randint(0, len(words) - 1)]
-devine = [len(word)]
-for i in range(len(word)):
-    devine[i] = "_"
+devine = ["_" for _ in range(len(word))]
 tries = []
-errorCount = 0
+errorCount = AtomicInteger(0)
+
+# Création de la fenetre
+window = Tk()
+window.title("Fenetre")
+window.geometry("1280x720")
+
+frame = Frame(window)
+frame.pack(expand=YES)
+
+lettersLabel = Label(frame)
+lettersLabel.grid(column=0, row=0)
+
+errorsLabel = Label(frame, justify="left")
+errorsLabel.grid(column=0, row=1)
+
+triesLabel = Label(frame)
+triesLabel.grid(column=0, row=2)
+
+infoLabel = Label(frame)
+infoLabel.grid(column=0, row=3)
+
+entry = Entry(frame)
+entry.grid(column=0, row=4)
+entry.bind('<Return>', processInput)
+
+# Start game
 game()
+
+window.mainloop()
