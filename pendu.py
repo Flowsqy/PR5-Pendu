@@ -1,7 +1,7 @@
 import random
 
 tab = [
-    "\n   +-------+\n   |\n   |\n   |\n   |\n  |\n==============",
+    "\n   +-------+\n   |\n   |\n   |\n   |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |\n   |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |       |\n   |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |      -|\n   |\n   |\n==============",
@@ -9,6 +9,16 @@ tab = [
     "\n   +-------+\n   |       |\n   |       O\n   |      -|-\n   |      |\n   |\n==============",
     "\n   +-------+\n   |       |\n   |       O\n   |      -|-\n   |      | |\n   |\n=============="
 ]
+
+
+class AtomicInteger:
+    """
+    Obligé de créer une classe parceque les int sont transmis par valeur et non par référence
+    Quel enfer
+    """
+
+    def __init__(self, value):
+        self.value = value
 
 
 def askLetter():
@@ -36,6 +46,7 @@ def game():
     drawLetters()
     while not loop():
         pass
+    endGame("_" not in devine)
 
 
 def endGame(win):
@@ -45,10 +56,10 @@ def endGame(win):
     :return: None
     """
     if win:
-        displayInfo("Tu as gagné, le mot était bien " + word.join(""))
+        displayInfo("Tu as gagné, le mot était bien " + "".join(word))
 
     else:
-        displayInfo("Tu as perdu, le mot était " + word.join(""))
+        displayInfo("Tu as perdu, le mot était " + "".join(word))
 
 
 def drawError():
@@ -56,9 +67,9 @@ def drawError():
     Afficher le pendu
     :return: true si le nombre maximal d'erreur est atteint, false sinon
     """
-    print(tab[errorCount])
-    errorCount += 1
-    return errorCount >= len(tab)
+    print(tab[errorCount.value])
+    errorCount.value += 1
+    return errorCount.value >= len(tab)
 
 
 def drawTries():
@@ -111,9 +122,10 @@ def loop():
         drawLetters()
     else:
         displayInfo("la lettre '" + letter + "' n'est pas dans le mot !")
+        drawLetters()
         if drawError():
             return True
-    return not "_" in devine
+    return "_" not in devine
 
 
 def checkLetter(proposition):
@@ -129,8 +141,7 @@ def checkLetter(proposition):
     if not character.isalpha():
         displayInfo(character + " n'est pas une lettre")
         return None
-    displayInfo("Entrez une lettre")
-    return character.toUpperCase()
+    return character.upper()
 
 
 def checkProposition(letter):
@@ -147,13 +158,11 @@ def checkProposition(letter):
     return output
 
 
-file = open("assets/dico.txt", "r", "utf-8")
+file = open("assets/dico.txt", mode="r", encoding="utf-8")
 words = file.readlines()
 file.close()
 word = words[random.randint(0, len(words) - 1)]
-devine = [len(word)]
-for i in range(len(word)):
-    devine[i] = "_"
+devine = ["_" for _ in range(len(word))]
 tries = []
-errorCount = 0
+errorCount = AtomicInteger(0)
 game()
