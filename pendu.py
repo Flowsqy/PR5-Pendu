@@ -171,7 +171,8 @@ def checkProposition(letter):
 
 
 file = open("assets/dico.txt", mode="r", encoding="utf-8")
-words = file.readlines()
+content = file.read()
+words = content.split("\n")
 file.close()
 word = words[random.randint(0, len(words) - 1)]
 devine = ["_" for _ in range(len(word))]
