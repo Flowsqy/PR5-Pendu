@@ -26,7 +26,7 @@ def askLetter():
     Récuperer la valeur insérée par l'utilisateur
     :return: La chaîne de caractères correspondante
     """
-    return input("Entrez une lettre")
+    return input("Entrez une lettre\n")
 
 
 def displayInfo(info):
