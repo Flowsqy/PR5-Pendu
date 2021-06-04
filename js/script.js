@@ -159,7 +159,7 @@ function loop(){
     }
     if(tries.includes(letter)){
         displayInfo("Tu as déjà utilisé la lettre " + letter);
-        return;
+        return false;
     }
     tries.push(letter);
     resetInput();
